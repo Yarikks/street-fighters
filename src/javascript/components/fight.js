@@ -119,15 +119,8 @@ function playerCriticalAttack(attacker, defender) {
   }
 }
 
-function getCriticalDamage(attacker, defender) {
-  let damage = getCriticalHitPower(attacker) - getBlockPower(defender);
-
-  if (damage < 0) {
-    damage = 0;
-  }
-  if(!defender.block){
-    damage = getCriticalHitPower(attacker);
-  }
+function getCriticalDamage(attacker) {
+  let damage = getCriticalHitPower(attacker);
 
   return damage;
 }
