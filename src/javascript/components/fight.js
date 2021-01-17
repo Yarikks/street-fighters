@@ -126,6 +126,9 @@ function getCriticalDamage(attacker, defender) {
   if (damage < 0) {
     damage = 0;
   }
+  if(!defender.block){
+    damage = getCriticalHitPower(attacker);
+  }
 
   return damage;
 }
@@ -135,6 +138,10 @@ export function getDamage(attacker, defender) {
 
   if (damage < 0) {
     damage = 0;
+  }
+
+  if(!defender.block){
+    damage = getHitPower(attacker);
   }
 
   return damage;
@@ -148,12 +155,9 @@ export function getHitPower(fighter) {
 }
 
 export function getBlockPower(fighter) {
+  const { defense } = fighter;
   let dodgeChance = getRandomNumber(1, 2);
-  let blockPower = fighter.defense * dodgeChance;
-
-  if (!fighter.block) {
-    blockPower = 0;
-  }
+  let blockPower = defense * dodgeChance;
 
   return blockPower;
 }
