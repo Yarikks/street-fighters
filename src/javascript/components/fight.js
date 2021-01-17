@@ -1,66 +1,73 @@
 import { controls } from '../../constants/controls';
 
-var fighterOne, fighterTwo;
-var winner = null;
-var keysPressed = new Map();
-
 export async function fight(firstFighter, secondFighter) {
-  fighterOne = Object.assign(firstFighter, { ...firstFighter, "block": false, "indicatorId": 'left-fighter-indicator', "currentHealth": firstFighter.health, "lastHit": 0, "lastComboHit": 0 });
-  fighterTwo = Object.assign(secondFighter, { ...secondFighter, "block": false, "indicatorId": 'right-fighter-indicator', "currentHealth": secondFighter.health, "lastHit": 0, "lastComboHit": 0 });
+  let winner = null;
+  let keysPressed = new Map();
+  let fighterOne = Object.assign(firstFighter, { ...firstFighter, "block": false, "indicatorId": 'left-fighter-indicator', "currentHealth": firstFighter.health, "lastComboHit": 0 });
+  let fighterTwo = Object.assign(secondFighter, { ...secondFighter, "block": false, "indicatorId": 'right-fighter-indicator', "currentHealth": secondFighter.health, "lastComboHit": 0 });
 
   window.addEventListener('keyup', handleKeyUp);
+
+  function handleKeyDown(event) {
+    keysPressed.set(event.code, true);
+  
+    switch (event.code) {
+      case controls.PlayerOneAttack:
+        playerAttack(fighterOne, fighterTwo);
+        break;
+      case controls.PlayerTwoAttack:
+        playerAttack(fighterTwo, fighterOne);
+        break;
+      case controls.PlayerOneBlock:
+        playerSetBlock(fighterOne);
+        break;
+      case controls.PlayerTwoBlock:
+        playerSetBlock(fighterTwo);
+        break;
+      default:
+        if (keysPressed.has(controls.PlayerOneCriticalHitCombination[0]) &&
+          keysPressed.has(controls.PlayerOneCriticalHitCombination[1]) &&
+          keysPressed.has(controls.PlayerOneCriticalHitCombination[2])) {
+          playerCriticalAttack(fighterOne, fighterTwo)
+        }
+        else if(keysPressed.has(controls.PlayerTwoCriticalHitCombination[0]) &&
+        keysPressed.has(controls.PlayerTwoCriticalHitCombination[1]) &&
+        keysPressed.has(controls.PlayerTwoCriticalHitCombination[2])){
+          playerCriticalAttack(fighterTwo, fighterOne);
+        }
+    }
+  }
+  
+  function handleKeyUp(event) {
+    keysPressed.delete(event.code);
+  
+    switch (event.code) {
+      case controls.PlayerOneBlock:
+        playerUnSetBlock(fighterOne);
+        break;
+      case controls.PlayerTwoBlock:
+        playerUnSetBlock(fighterTwo);
+        break;
+    }
+  }
 
   return new Promise((resolve) => {
     window.addEventListener('keydown', (event) => {
       handleKeyDown(event);
-      if (winner != null) {
+
+      if(fighterOne.currentHealth <= 0){
+        winner = fighterTwo;
+      } else if(fighterTwo.currentHealth <= 0){
+        winner = fighterOne;
+      }
+
+      if(winner != null) {
+        window.removeEventListener('keydown', handleKeyDown)
+        window.removeEventListener('keyup', handleKeyUp);
         resolve(winner);
       }
     });
   });
-}
-
-function handleKeyDown(event) {
-  keysPressed.set(event.code, true);
-
-  switch (event.code) {
-    case controls.PlayerOneAttack:
-      playerAttack(fighterOne, fighterTwo);
-      break;
-    case controls.PlayerTwoAttack:
-      playerAttack(fighterTwo, fighterOne);
-      break;
-    case controls.PlayerOneBlock:
-      playerSetBlock(fighterOne);
-      break;
-    case controls.PlayerTwoBlock:
-      playerSetBlock(fighterTwo);
-      break;
-    default:
-      if (keysPressed.has(controls.PlayerOneCriticalHitCombination[0]) &&
-        keysPressed.has(controls.PlayerOneCriticalHitCombination[1]) &&
-        keysPressed.has(controls.PlayerOneCriticalHitCombination[2])) {
-        playerCriticalAttack(fighterOne, fighterTwo)
-      }
-      else if(keysPressed.has(controls.PlayerTwoCriticalHitCombination[0]) &&
-      keysPressed.has(controls.PlayerTwoCriticalHitCombination[1]) &&
-      keysPressed.has(controls.PlayerTwoCriticalHitCombination[2])){
-        playerCriticalAttack(fighterTwo, fighterOne);
-      }
-  }
-}
-
-function handleKeyUp(event) {
-  keysPressed.delete(event.code);
-
-  switch (event.code) {
-    case controls.PlayerOneBlock:
-      playerUnSetBlock(fighterOne);
-      break;
-    case controls.PlayerTwoBlock:
-      playerUnSetBlock(fighterTwo);
-      break;
-  }
 }
 
 function isOutOfLimitCritical(attacker) {
@@ -69,17 +76,6 @@ function isOutOfLimitCritical(attacker) {
 
   if (result) {
     attacker.lastComboHit = date;
-  }
-
-  return result;
-}
-
-function isOutOfLimitHit(attacker) {
-  const date = (new Date()).getTime();
-  let result = (date - attacker.lastHit) > 500;
-
-  if (result) {
-    attacker.lastHit = date;
   }
 
   return result;
@@ -100,13 +96,11 @@ function changeIndicator(fighter) {
 }
 
 function playerAttack(attacker, defender) {
-  if (!attacker.block && isOutOfLimitHit(attacker)) {
+  if(defender.block) return;
+  if (!attacker.block) {
     let damage = getDamage(attacker, defender);
     defender.currentHealth -= damage;
 
-    if (defender.currentHealth <= 0) {
-      winner = attacker;
-    }
     changeIndicator(defender);
   }
 }
@@ -130,10 +124,6 @@ export function getDamage(attacker, defender) {
 
   if (damage < 0) {
     damage = 0;
-  }
-
-  if(!defender.block){
-    damage = getHitPower(attacker);
   }
 
   return damage;
