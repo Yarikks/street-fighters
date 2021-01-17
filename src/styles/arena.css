@@ -20,8 +20,20 @@
   transform: scaleX(-1);
 }
 
+.arena___fighter {
+  display: flex;
+  flex-direction: column;
+  height: 520px;
+  justify-content: flex-end;
+}
+
+.arena___fighter .fighter-preview___img {
+  align-self: flex-end;
+}
+
 .arena___fighter img {
   height: 480px;
+  user-select: none;
 }
 
 .arena___fight-status {
@@ -60,4 +72,14 @@
   height: 100%;
   width: 100%;
   background-color: #ebd759;
+}
+
+
+.missed-attack {
+  position: relative;
+  font-size: 32px;
+  color: red;
+  z-index: 1;
+  height: 40px;
+  text-align: center;
 }

@@ -13,6 +13,10 @@
   align-items: flex-start;
 }
 
+.fighter-preview___img {
+  user-select: none;
+}
+
 .fighter-preview___right img {
   transform: scaleX(-1);
 }

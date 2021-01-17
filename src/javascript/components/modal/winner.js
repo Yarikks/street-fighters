@@ -8,8 +8,8 @@ export function showWinnerModal(fighter) {
     title: `Winner is ${fighter.name} !🥳🥳🥳`,
     bodyElement: createFighterPreview(fighter, 'right'),
     onClose: () => {
-      root.innerHTML = "";
-      new App();
+      location.reload();
+      return false;
     }
   }
   showModal(modalData);

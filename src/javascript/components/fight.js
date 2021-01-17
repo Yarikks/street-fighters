@@ -1,16 +1,17 @@
 import { controls } from '../../constants/controls';
+import { missedAttackAnimation } from './fightAnimations';
 
 export async function fight(firstFighter, secondFighter) {
   let winner = null;
   let keysPressed = new Map();
-  let fighterOne = Object.assign(firstFighter, { ...firstFighter, "block": false, "indicatorId": 'left-fighter-indicator', "currentHealth": firstFighter.health, "lastComboHit": 0 });
-  let fighterTwo = Object.assign(secondFighter, { ...secondFighter, "block": false, "indicatorId": 'right-fighter-indicator', "currentHealth": secondFighter.health, "lastComboHit": 0 });
+  let fighterOne = Object.assign(firstFighter, { ...firstFighter, "block": false, "indicatorId": 'left-fighter-indicator', "currentHealth": firstFighter.health, "lastComboHit": 0, "position": 'left' });
+  let fighterTwo = Object.assign(secondFighter, { ...secondFighter, "block": false, "indicatorId": 'right-fighter-indicator', "currentHealth": secondFighter.health, "lastComboHit": 0, "position": 'right' });
 
   window.addEventListener('keyup', handleKeyUp);
 
   function handleKeyDown(event) {
     keysPressed.set(event.code, true);
-  
+
     switch (event.code) {
       case controls.PlayerOneAttack:
         playerAttack(fighterOne, fighterTwo);
@@ -30,17 +31,17 @@ export async function fight(firstFighter, secondFighter) {
           keysPressed.has(controls.PlayerOneCriticalHitCombination[2])) {
           playerCriticalAttack(fighterOne, fighterTwo)
         }
-        else if(keysPressed.has(controls.PlayerTwoCriticalHitCombination[0]) &&
-        keysPressed.has(controls.PlayerTwoCriticalHitCombination[1]) &&
-        keysPressed.has(controls.PlayerTwoCriticalHitCombination[2])){
+        else if (keysPressed.has(controls.PlayerTwoCriticalHitCombination[0]) &&
+          keysPressed.has(controls.PlayerTwoCriticalHitCombination[1]) &&
+          keysPressed.has(controls.PlayerTwoCriticalHitCombination[2])) {
           playerCriticalAttack(fighterTwo, fighterOne);
         }
     }
   }
-  
+
   function handleKeyUp(event) {
     keysPressed.delete(event.code);
-  
+
     switch (event.code) {
       case controls.PlayerOneBlock:
         playerUnSetBlock(fighterOne);
@@ -55,13 +56,13 @@ export async function fight(firstFighter, secondFighter) {
     window.addEventListener('keydown', (event) => {
       handleKeyDown(event);
 
-      if(fighterOne.currentHealth <= 0){
+      if (fighterOne.currentHealth <= 0) {
         winner = fighterTwo;
-      } else if(fighterTwo.currentHealth <= 0){
+      } else if (fighterTwo.currentHealth <= 0) {
         winner = fighterOne;
       }
 
-      if(winner != null) {
+      if (winner != null) {
         window.removeEventListener('keydown', handleKeyDown)
         window.removeEventListener('keyup', handleKeyUp);
         resolve(winner);
@@ -96,7 +97,7 @@ function changeIndicator(fighter) {
 }
 
 function playerAttack(attacker, defender) {
-  if(defender.block) return;
+  if (defender.block) return;
   if (!attacker.block) {
     let damage = getDamage(attacker, defender);
     defender.currentHealth -= damage;
@@ -123,6 +124,7 @@ export function getDamage(attacker, defender) {
   let damage = getHitPower(attacker) - getBlockPower(defender);
 
   if (damage < 0) {
+    missedAttackAnimation(attacker.position);
     damage = 0;
   }
 

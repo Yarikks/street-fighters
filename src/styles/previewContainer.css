@@ -17,6 +17,7 @@
 
 .preview-container___versus-img {
   width: 130px;
+  user-select: none;
 }
 
 .preview-container___fight-btn {
