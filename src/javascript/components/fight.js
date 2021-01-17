@@ -37,15 +37,14 @@ function handleKeyDown(event) {
       playerSetBlock(fighterTwo);
       break;
     default:
-      console.log(keysPressed);
-      if (keysPressed.get(controls.PlayerOneCriticalHitCombination[0]) &&
-        keysPressed.get(controls.PlayerOneCriticalHitCombination[1]) &&
-        keysPressed.get(controls.PlayerOneCriticalHitCombination[2])) {
+      if (keysPressed.has(controls.PlayerOneCriticalHitCombination[0]) &&
+        keysPressed.has(controls.PlayerOneCriticalHitCombination[1]) &&
+        keysPressed.has(controls.PlayerOneCriticalHitCombination[2])) {
         playerCriticalAttack(fighterOne, fighterTwo)
       }
-      else if(keysPressed.get(controls.PlayerTwoCriticalHitCombination[0]) &&
-      keysPressed.get(controls.PlayerTwoCriticalHitCombination[1]) &&
-      keysPressed.get(controls.PlayerTwoCriticalHitCombination[2])){
+      else if(keysPressed.has(controls.PlayerTwoCriticalHitCombination[0]) &&
+      keysPressed.has(controls.PlayerTwoCriticalHitCombination[1]) &&
+      keysPressed.has(controls.PlayerTwoCriticalHitCombination[2])){
         playerCriticalAttack(fighterTwo, fighterOne);
       }
   }
@@ -64,25 +63,7 @@ function handleKeyUp(event) {
   }
 }
 
-function changeIndicator(fighter) {
-  let indicatorElement = document.getElementById(fighter.indicatorId);
-  let indicatorWidth = 100 * (fighter.currentHealth / fighter.health) + '%';
-  indicatorElement.style.width = indicatorWidth;
-}
-
-function playerAttack(attacker, defender) {
-  if (!attacker.block && isLimitedHit(attacker)) {
-    let damage = getDamage(attacker, defender);
-    defender.currentHealth -= damage;
-
-    if (defender.currentHealth <= 0) {
-      winner = attacker;
-    }
-    changeIndicator(defender);
-  }
-}
-
-function isLimitedCritical(attacker) {
+function isOutOfLimitCritical(attacker) {
   const date = (new Date()).getTime();
   let result = (date - attacker.lastComboHit) > 10000;
 
@@ -93,7 +74,7 @@ function isLimitedCritical(attacker) {
   return result;
 }
 
-function isLimitedHit(attacker) {
+function isOutOfLimitHit(attacker) {
   const date = (new Date()).getTime();
   let result = (date - attacker.lastHit) > 500;
 
@@ -104,20 +85,38 @@ function isLimitedHit(attacker) {
   return result;
 }
 
-function playerCriticalAttack(attacker, defender) {
-  if (!attacker.block && isLimitedCritical(attacker)) {
-    let damage = getCriticalDamage(attacker, defender);
-    defender.currentHealth -= damage;
-    changeIndicator(defender);
-  }
-}
-
 function playerSetBlock(fighter) {
   fighter.block = true;
 }
 
 function playerUnSetBlock(fighter) {
   fighter.block = false;
+}
+
+function changeIndicator(fighter) {
+  let indicatorElement = document.getElementById(fighter.indicatorId);
+  let indicatorWidth = 100 * (fighter.currentHealth / fighter.health) + '%';
+  indicatorElement.style.width = indicatorWidth;
+}
+
+function playerAttack(attacker, defender) {
+  if (!attacker.block && isOutOfLimitHit(attacker)) {
+    let damage = getDamage(attacker, defender);
+    defender.currentHealth -= damage;
+
+    if (defender.currentHealth <= 0) {
+      winner = attacker;
+    }
+    changeIndicator(defender);
+  }
+}
+
+function playerCriticalAttack(attacker, defender) {
+  if (!attacker.block && isOutOfLimitCritical(attacker)) {
+    let damage = getCriticalDamage(attacker, defender);
+    defender.currentHealth -= damage;
+    changeIndicator(defender);
+  }
 }
 
 function getCriticalDamage(attacker, defender) {
