@@ -3,7 +3,7 @@ import { fightersDetails, fighters } from './mockData';
 const API_URL = 'https://api.github.com/repos/binary-studio-academy/stage-2-es6-for-everyone/contents/resources/api/';
 const useMockAPI = true;
 
-async function callApi(endpoint, method) {
+async function callApi(endpoint: string, method: string): Promise<any> {
   const url = API_URL + endpoint;
   const options = {
     method,
@@ -19,15 +19,15 @@ async function callApi(endpoint, method) {
         });
 }
 
-async function fakeCallApi(endpoint) {
-  const response = endpoint === 'fighters.json' ? fighters : getFighterById(endpoint);
+async function fakeCallApi(endpoint: string): Promise<FighterInfo | ReducedFighterInfo[]>  {
+  const response: FighterInfo | ReducedFighterInfo[] | undefined = endpoint === 'fighters.json' ? fighters : getFighterById(endpoint);
 
   return new Promise((resolve, reject) => {
     setTimeout(() => (response ? resolve(response) : reject(Error('Failed to load'))), 500);
   });
 }
 
-function getFighterById(endpoint) {
+function getFighterById(endpoint: string): FighterInfo | undefined {
   const start = endpoint.lastIndexOf('/');
   const end = endpoint.lastIndexOf('.json');
   const id = endpoint.substring(start + 1, end);

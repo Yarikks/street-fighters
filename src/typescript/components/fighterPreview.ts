@@ -1,6 +1,6 @@
 import { createElement } from '../helpers/domHelper';
 
-export function createFighterPreview(fighter, position) {
+export function createFighterPreview(fighter: FighterInfo, position: string) {
   const positionClassName = position === 'right' ? 'fighter-preview___right' : 'fighter-preview___left';
   const fighterElement = createElement({
     tagName: 'div',
@@ -25,7 +25,7 @@ export function createFighterPreview(fighter, position) {
   return fighterElement;
 }
 
-export function createFighterImage(fighter) {
+export function createFighterImage(fighter: FighterInfo) {
   const { source, name } = fighter;
   const attributes = { 
     src: source, 
@@ -42,7 +42,7 @@ export function createFighterImage(fighter) {
   return imgElement;
 }
 
-export function createFighterInfo(fighter) {
+export function createFighterInfo(fighter: FighterInfo) {
   const { name, health, attack, defense } = fighter;
 
   const infoBlockElement = createElement({

@@ -5,9 +5,9 @@ import { createFighterPreview } from './fighterPreview';
 import { fighterService } from '../services/fightersService';
 
 export function createFightersSelector() {
-  let selectedFighters = [];
+  let selectedFighters: FighterInfo[] = [];
 
-  return async (event, fighterId) => {
+  return async (event:any, fighterId: string) => {
     const fighter = await getFighterInfo(fighterId);
     const [playerOne, playerTwo] = selectedFighters;
     let firstFighter = playerOne ?? fighter;
@@ -25,7 +25,7 @@ export function createFightersSelector() {
 
 const fighterDetailsMap = new Map();
 
-export async function getFighterInfo(fighterId) {
+export async function getFighterInfo(fighterId: string) {
   // get fighter info from fighterDetailsMap or from service and write it to fighterDetailsMap
   if(!fighterDetailsMap.has(fighterId)){
     const fighter = fighterService.getFighterDetails(fighterId);
@@ -35,18 +35,19 @@ export async function getFighterInfo(fighterId) {
   return fighterDetailsMap.get(fighterId);
 }
 
-function renderSelectedFighters(selectedFighters) {
+function renderSelectedFighters(selectedFighters: FighterInfo[]) {
   const fightersPreview = document.querySelector('.preview-container___root');
   const [playerOne, playerTwo] = selectedFighters;
   const firstPreview = createFighterPreview(playerOne, 'left');
   const secondPreview = createFighterPreview(playerTwo, 'right');
   const versusBlock = createVersusBlock(selectedFighters);
-
-  fightersPreview.innerHTML = '';
-  fightersPreview.append(firstPreview, versusBlock, secondPreview);
+  if(fightersPreview){
+    fightersPreview.innerHTML = '';
+    fightersPreview.append(firstPreview, versusBlock, secondPreview);
+  }
 }
 
-function createVersusBlock(selectedFighters) {
+function createVersusBlock(selectedFighters: FighterInfo[]) {
   const canStartFight = selectedFighters.filter(Boolean).length === 2;
   const onClick = () => startFight(selectedFighters);
   const container = createElement({ tagName: 'div', className: 'preview-container___versus-block' });
@@ -68,6 +69,6 @@ function createVersusBlock(selectedFighters) {
   return container;
 }
 
-function startFight(selectedFighters) {
+function startFight(selectedFighters: FighterInfo[]) {
   renderArena(selectedFighters);
 }

@@ -1,17 +1,17 @@
 import { createElement } from '../../helpers/domHelper';
 
-export function showModal({ title, bodyElement, onClose = () => {} }) {
+export function showModal({ title, bodyElement, onClose = () => {} } : {title: string, bodyElement: HTMLElement, onClose: () => void}) {
   const root = getModalContainer();
   const modal = createModal({ title, bodyElement, onClose }); 
-  
-  root.append(modal);
+  if(root)
+    root.append(modal);
 }
 
 function getModalContainer() {
   return document.getElementById('root');
 }
 
-function createModal({ title, bodyElement, onClose }) {
+function createModal({ title, bodyElement, onClose } : {title: string, bodyElement: HTMLElement, onClose: () => void}) {
   const layer = createElement({ tagName: 'div', className: 'modal-layer' });
   const modalContainer = createElement({ tagName: 'div', className: 'modal-root' });
   const header = createHeader(title, onClose);
@@ -22,7 +22,7 @@ function createModal({ title, bodyElement, onClose }) {
   return layer;
 }
 
-function createHeader(title, onClose) {
+function createHeader(title:string, onClose: () => void) {
   const headerElement = createElement({ tagName: 'div', className: 'modal-header' });
   const titleElement = createElement({ tagName: 'span' });
   const closeButton = createElement({ tagName: 'div', className: 'close-btn' });

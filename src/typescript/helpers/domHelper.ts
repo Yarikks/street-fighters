@@ -1,4 +1,12 @@
-export function createElement({ tagName, className, attributes = {} }) {
+export function createElement({
+  tagName,
+  className,
+  attributes = {},
+}: {
+  tagName: string;
+  className?: string;
+  attributes?: { [key: string]: string };
+}) {
   const element = document.createElement(tagName);
 
   if (className) {

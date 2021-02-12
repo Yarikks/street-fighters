@@ -1,6 +1,6 @@
 import { createElement } from '../helpers/domHelper';
 
-export function missedAttackAnimation(position) {
+export function missedAttackAnimation(position: string) {
     let fighterBlock = document.getElementsByClassName(`arena___fighter arena___${position}-fighter`)[0];
     const missedElement = createElement({
         tagName: 'div',
@@ -14,7 +14,7 @@ export function missedAttackAnimation(position) {
     ],
         {
             duration: 300,
-            iteration: 1,
+            iterations: 1,
         });
 
     fighterBlock.prepend(missedElement);

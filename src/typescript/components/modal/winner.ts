@@ -1,10 +1,8 @@
 import { showModal } from "./modal";
 import { createFighterPreview} from '../fighterPreview';
-import App from '../../app';
 
-export function showWinnerModal(fighter) {
-  const root = document.getElementById('root');
-  let modalData = {
+export function showWinnerModal(fighter: FighterInfo) {
+  const modalData = {
     title: `Winner is ${fighter.name} !🥳🥳🥳`,
     bodyElement: createFighterPreview(fighter, 'right'),
     onClose: () => {

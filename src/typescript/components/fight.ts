@@ -1,15 +1,15 @@
 import { controls } from '../../constants/controls';
 import { missedAttackAnimation } from './fightAnimations';
 
-export async function fight(firstFighter, secondFighter) {
-  let winner = null;
-  let keysPressed = new Map();
-  let fighterOne = Object.assign(firstFighter, { ...firstFighter, "block": false, "indicatorId": 'left-fighter-indicator', "currentHealth": firstFighter.health, "lastComboHit": 0, "position": 'left' });
-  let fighterTwo = Object.assign(secondFighter, { ...secondFighter, "block": false, "indicatorId": 'right-fighter-indicator', "currentHealth": secondFighter.health, "lastComboHit": 0, "position": 'right' });
+export async function fight(firstFighter: FighterInfo, secondFighter: FighterInfo): Promise<FighterInfo> {
+  let winner: FighterInfo;
+  const keysPressed = new Map();
+  const fighterOne = Object.assign(firstFighter, { ...firstFighter, "block": false, "indicatorId": 'left-fighter-indicator', "currentHealth": firstFighter.health, "lastComboHit": 0, "position": 'left' });
+  const fighterTwo = Object.assign(secondFighter, { ...secondFighter, "block": false, "indicatorId": 'right-fighter-indicator', "currentHealth": secondFighter.health, "lastComboHit": 0, "position": 'right' });
 
   window.addEventListener('keyup', handleKeyUp);
 
-  function handleKeyDown(event) {
+  function handleKeyDown(event: KeyboardEvent) {
     keysPressed.set(event.code, true);
 
     switch (event.code) {
@@ -39,7 +39,7 @@ export async function fight(firstFighter, secondFighter) {
     }
   }
 
-  function handleKeyUp(event) {
+  function handleKeyUp(event: KeyboardEvent) {
     keysPressed.delete(event.code);
 
     switch (event.code) {
@@ -71,9 +71,9 @@ export async function fight(firstFighter, secondFighter) {
   });
 }
 
-function isOutOfLimitCritical(attacker) {
+function isOutOfLimitCritical(attacker: ExtendedFighterInfo) {
   const date = (new Date()).getTime();
-  let result = (date - attacker.lastComboHit) > 10000;
+  const result = (date - attacker.lastComboHit) > 10000;
 
   if (result) {
     attacker.lastComboHit = date;
@@ -82,45 +82,46 @@ function isOutOfLimitCritical(attacker) {
   return result;
 }
 
-function playerSetBlock(fighter) {
+function playerSetBlock(fighter: ExtendedFighterInfo) {
   fighter.block = true;
 }
 
-function playerUnSetBlock(fighter) {
+function playerUnSetBlock(fighter: ExtendedFighterInfo) {
   fighter.block = false;
 }
 
-function changeIndicator(fighter) {
-  let indicatorElement = document.getElementById(fighter.indicatorId);
-  let indicatorWidth = 100 * (fighter.currentHealth / fighter.health) + '%';
-  indicatorElement.style.width = indicatorWidth;
+function changeIndicator(fighter: ExtendedFighterInfo) {
+  const indicatorElement = document.getElementById(fighter.indicatorId);
+  const indicatorWidth = 100 * (fighter.currentHealth / fighter.health) + '%';
+  if(indicatorElement)
+    indicatorElement.style.width = indicatorWidth;
 }
 
-function playerAttack(attacker, defender) {
+function playerAttack(attacker: ExtendedFighterInfo, defender: ExtendedFighterInfo) {
   if (defender.block) return;
   if (!attacker.block) {
-    let damage = getDamage(attacker, defender);
+    const damage = getDamage(attacker, defender);
     defender.currentHealth -= damage;
 
     changeIndicator(defender);
   }
 }
 
-function playerCriticalAttack(attacker, defender) {
+function playerCriticalAttack(attacker: ExtendedFighterInfo, defender: ExtendedFighterInfo) {
   if (!attacker.block && isOutOfLimitCritical(attacker)) {
-    let damage = getCriticalDamage(attacker, defender);
+    const damage = getCriticalDamage(attacker);
     defender.currentHealth -= damage;
     changeIndicator(defender);
   }
 }
 
-function getCriticalDamage(attacker) {
-  let damage = getCriticalHitPower(attacker);
+function getCriticalDamage(attacker: ExtendedFighterInfo) {
+  const damage = getCriticalHitPower(attacker);
 
   return damage;
 }
 
-export function getDamage(attacker, defender) {
+export function getDamage(attacker: ExtendedFighterInfo, defender: ExtendedFighterInfo) {
   let damage = getHitPower(attacker) - getBlockPower(defender);
 
   if (damage < 0) {
@@ -131,25 +132,25 @@ export function getDamage(attacker, defender) {
   return damage;
 }
 
-export function getHitPower(fighter) {
-  let criticalHitChance = getRandomNumber(1, 2);
-  let hitPower = fighter.attack * criticalHitChance;
+export function getHitPower(fighter: ExtendedFighterInfo) {
+  const criticalHitChance = getRandomNumber(1, 2);
+  const hitPower = fighter.attack * criticalHitChance;
 
   return hitPower;
 }
 
-export function getBlockPower(fighter) {
+export function getBlockPower(fighter: ExtendedFighterInfo) {
   const { defense } = fighter;
-  let dodgeChance = getRandomNumber(1, 2);
-  let blockPower = defense * dodgeChance;
+  const dodgeChance = getRandomNumber(1, 2);
+  const blockPower = defense * dodgeChance;
 
   return blockPower;
 }
 
-function getCriticalHitPower(fighter) {
+function getCriticalHitPower(fighter: ExtendedFighterInfo) {
   return 2 * fighter.attack;
 }
 
-function getRandomNumber(min, max) {
+function getRandomNumber(min: number, max: number) {
   return Math.random() * (max - min) + min;
 }
